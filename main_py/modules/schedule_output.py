@@ -52,9 +52,10 @@ def attend_course_schedule_df(result_df):
     attend_df = result_df[result_df["出席予定"] == "〇"]
     # 日付とプログラム名だけ抽出
     attend_df = attend_df[["日付", "プログラム名"]].copy()
-    attend_df["日付"] = attend_df["日付"].apply(
-        lambda x: x.replace(hour=10, minute=0, second=0) if pd.notnull(x) else x
-    )
+    attend_df["日付"] = pd.to_datetime(attend_df["日付"], errors="coerce")
+    attend_df["日付"] = (
+        attend_df["日付"].dt.normalize() + pd.Timedelta(hours=10)
+    ).dt.strftime("%Y/%m/%d %H:%M")
     print("\n --- 結果を表示する ---/")
     print(attend_df)
     return attend_df
@@ -76,6 +77,7 @@ def output_to_new_sheet(file_path, result_df, attend_df):
         engine="openpyxl",
         if_sheet_exists="replace",
         datetime_format="yyyy/mm/dd hh:mm",
+        # date_format="yyyy/mm/dd",
     ) as writer:
         attend_df.to_excel(writer, sheet_name=attend_sheet_name, index=False)
         print(f"{attend_sheet_name}に保存しました")
