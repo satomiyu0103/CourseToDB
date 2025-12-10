@@ -51,7 +51,7 @@ def attend_course_schedule_df(result_df):
     # 出席予定が〇の行を抽出
     attend_df = result_df[result_df["出席予定"] == "〇"]
     # 日付とプログラム名だけ抽出
-    attend_df = attend_df[["日付", "プログラム名"]]
+    attend_df = attend_df[["日付", "プログラム名"]].copy()
     attend_df["日付"] = attend_df["日付"].apply(
         lambda x: x.replace(hour=10, minute=0, second=0) if pd.notnull(x) else x
     )
@@ -71,7 +71,11 @@ def output_to_new_sheet(file_path, result_df, attend_df):
         print(f"{new_sheet_name}に保存しました")
 
     with pd.ExcelWriter(
-        file_path, mode="a", engine="openpyxl", if_sheet_exists="replace"
+        file_path,
+        mode="a",
+        engine="openpyxl",
+        if_sheet_exists="replace",
+        datetime_format="yyyy/mm/dd hh:mm",
     ) as writer:
         attend_df.to_excel(writer, sheet_name=attend_sheet_name, index=False)
         print(f"{attend_sheet_name}に保存しました")
