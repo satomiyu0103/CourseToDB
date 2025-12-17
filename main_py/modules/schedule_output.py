@@ -57,7 +57,7 @@ def attend_course_schedule_df(result_df):
     end_time = attend_df["日付"].dt.normalize() + pd.Timedelta(hours=12)
     attend_df["日付"] = (
         start_time.dt.strftime("%Y/%m/%d %H:%M")
-        + " - "
+        + " → "
         + end_time.dt.strftime("%Y/%m/%d %H:%M")
     )
     print("\n --- 結果を表示する ---/")
