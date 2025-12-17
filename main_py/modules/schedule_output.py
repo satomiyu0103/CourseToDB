@@ -53,9 +53,13 @@ def attend_course_schedule_df(result_df):
     # 日付とプログラム名だけ抽出
     attend_df = attend_df[["日付", "プログラム名"]].copy()
     attend_df["日付"] = pd.to_datetime(attend_df["日付"], errors="coerce")
+    start_time = attend_df["日付"].dt.normalize() + pd.Timedelta(hours=10)
+    end_time = attend_df["日付"].dt.normalize() + pd.Timedelta(hours=12)
     attend_df["日付"] = (
-        attend_df["日付"].dt.normalize() + pd.Timedelta(hours=10)
-    ).dt.strftime("%Y/%m/%d %H:%M")
+        start_time.dt.strftime("%Y/%m/%d %H:%M")
+        + " - "
+        + end_time.dt.strftime("%Y/%m/%d %H:%M")
+    )
     print("\n --- 結果を表示する ---/")
     print(attend_df)
     return attend_df
