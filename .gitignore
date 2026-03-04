@@ -17,7 +17,6 @@ __pycache__/
 
 # 情報フォルダ
 draft/
-config/
 data/
 logs/
 *.log
