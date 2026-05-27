@@ -103,8 +103,26 @@ def default_csv_path(file_path: str) -> Path:
     return excel_path.with_name(f"{stem}_notion.csv")
 
 
+def legacy_csv_paths(file_path: str) -> list[Path]:
+    """以前の命名規則で出力されたCSVの候補"""
+    excel_path = Path(file_path)
+    return [excel_path.with_name(f"{excel_path.stem}_notion.csv")]
+
+
+def cleanup_legacy_csv_files(file_path: str, current_csv_path: Path) -> None:
+    for legacy_path in legacy_csv_paths(file_path):
+        if legacy_path == current_csv_path or not legacy_path.exists():
+            continue
+        legacy_path.unlink()
+        print(f"旧CSVを削除しました: {legacy_path}")
+
+
 def export_attend_csv(attend_df: pd.DataFrame, csv_path: str | Path) -> Path:
     csv_path = Path(csv_path)
+    csv_path.parent.mkdir(parents=True, exist_ok=True)
+    if csv_path.exists():
+        print(f"既存CSVを上書きします: {csv_path}")
+
     csv_df = attend_df_to_csv_df(attend_df)
     csv_df.to_csv(csv_path, index=False, encoding="utf-8-sig", columns=CSV_COLUMNS)
     print(f"CSVを保存しました: {csv_path}")
@@ -113,17 +131,20 @@ def export_attend_csv(attend_df: pd.DataFrame, csv_path: str | Path) -> Path:
 
 def export_attend_csv_from_excel(file_path: str, csv_path: str | Path | None = None) -> Path:
     attend_df = read_attend_sheet(file_path, ATTEND_SHEET_NAME)
+    output_path = Path(csv_path) if csv_path else default_csv_path(file_path)
+
     if attend_df.empty:
         print(f"エラー: {ATTEND_SHEET_NAME} にデータがありません")
-        return Path(csv_path) if csv_path else default_csv_path(file_path)
+        return output_path
 
-    output_path = Path(csv_path) if csv_path else default_csv_path(file_path)
+    cleanup_legacy_csv_files(file_path, output_path)
     return export_attend_csv(attend_df, output_path)
 
 
 def output_to_new_sheet(file_path, result_df, attend_df):
     # できたスケジュールを元のExcelに作成した新シートに出力する
     new_sheet_name = "今月の講座一覧表"
+    print(f"Excelシートを上書き保存します: {file_path}")
     with pd.ExcelWriter(
         file_path,
         mode="a",

@@ -30,14 +30,19 @@ def load_project_env() -> Path:
     return project_root
 
 
-def build_excel(file_path: str) -> None:
+def build_excel(file_path: str) -> bool:
     result_df = creat_schedule_df(file_path)
     if result_df is None or result_df.empty:
         print("エラー: スケジュールを抽出できませんでした")
-        return
+        return False
 
     attend_df = attend_course_schedule_df(result_df)
+    if attend_df.empty:
+        print("エラー: 参加講座がありません")
+        return False
+
     output_to_new_sheet(file_path, result_df, attend_df)
+    return True
 
 
 def export_csv(file_path: str, csv_path: str | None = None) -> None:
@@ -53,7 +58,7 @@ def main() -> None:
     parser.add_argument(
         "--export-csv",
         action="store_true",
-        help="確認済みの参加講座一覧表から CSV を出力する",
+        help="Excelの確認・修正後にCSVだけ再出力する",
     )
     args = parser.parse_args()
 
@@ -72,11 +77,14 @@ def main() -> None:
 
     print(f"使用ファイル: {file_path}")
 
+    csv_path = csv_output_path or default_csv_path(file_path)
+
     if args.export_csv:
-        export_csv(file_path, csv_output_path or default_csv_path(file_path))
+        export_csv(file_path, csv_path)
         return
 
-    build_excel(file_path)
+    if build_excel(file_path):
+        export_csv(file_path, csv_path)
 
 
 if __name__ == "__main__":
