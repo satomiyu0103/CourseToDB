@@ -2,10 +2,17 @@
 ■ スケジュールリストの作成
 ===================="""
 
+from pathlib import Path
+
 import pandas as pd
 
-from modules.calendar_io import find_calendar_name, input_file_to_df
+from modules.calendar_io import find_calendar_name, input_file_to_df, read_attend_sheet
 from modules.calendar_parser import creat_month_schdule, deside_setting
+
+ATTEND_SHEET_NAME = "参加講座一覧表"
+JST_OFFSET = "+09:00"
+ATTEND_COLUMNS = ["日付", "講座名", "開始日時", "終了日時"]
+CSV_COLUMNS = ["title", "start", "end"]
 
 
 def list_to_df(all_events):
@@ -44,44 +51,88 @@ def creat_schedule_df(file_path):
     return result_df
 
 
+def _build_course_datetimes(date_series):
+    dates = pd.to_datetime(date_series, errors="coerce")
+    normalized = dates.dt.normalize()
+    start = normalized + pd.Timedelta(hours=10)
+    end = normalized + pd.Timedelta(hours=12)
+    return normalized, start, end
+
+
+def format_jst_datetime(value) -> str:
+    ts = pd.Timestamp(value)
+    if pd.isna(ts):
+        return ""
+    return ts.strftime("%Y/%m/%d %H:%M") + JST_OFFSET
+
+
 def attend_course_schedule_df(result_df):
     """
-    出席予定が〇の行だけ抽出し、日付とプログラム名だけのDataFrameを返す
+    出席予定が〇の行だけ抽出し、確認用の4列DataFrameを返す
     """
-    # 出席予定が〇の行を抽出
-    attend_df = result_df[result_df["出席予定"] == "〇"]
-    # 日付とプログラム名だけ抽出
-    attend_df = attend_df[["日付", "プログラム名"]].copy()
-    attend_df["日付"] = pd.to_datetime(attend_df["日付"], errors="coerce")
-    start_time = attend_df["日付"].dt.normalize() + pd.Timedelta(hours=10)
-    end_time = attend_df["日付"].dt.normalize() + pd.Timedelta(hours=12)
-    attend_df["日付"] = (
-        start_time.dt.strftime("%Y/%m/%d %H:%M")
-        + " → "
-        + end_time.dt.strftime("%Y/%m/%d %H:%M")
-    )
+    if result_df is None or result_df.empty:
+        print("結果を抽出できませんでした。設定を確認してください")
+        return pd.DataFrame(columns=ATTEND_COLUMNS)
+
+    attend_df = result_df[result_df["出席予定"] == "〇"][["日付", "プログラム名"]].copy()
+    dates, start, end = _build_course_datetimes(attend_df["日付"])
+    attend_df["日付"] = dates
+    attend_df["開始日時"] = start
+    attend_df["終了日時"] = end
+    attend_df = attend_df.rename(columns={"プログラム名": "講座名"})
+    attend_df = attend_df[ATTEND_COLUMNS]
+
     print("\n --- 結果を表示する ---/")
     print(attend_df)
     return attend_df
 
 
+def attend_df_to_csv_df(attend_df: pd.DataFrame) -> pd.DataFrame:
+    return pd.DataFrame(
+        {
+            "title": attend_df["講座名"],
+            "start": attend_df["開始日時"].apply(format_jst_datetime),
+            "end": attend_df["終了日時"].apply(format_jst_datetime),
+        }
+    )
+
+
+def default_csv_path(file_path: str) -> Path:
+    excel_path = Path(file_path)
+    stem = excel_path.stem.replace("配布用_", "登録用_", 1)
+    return excel_path.with_name(f"{stem}_notion.csv")
+
+
+def export_attend_csv(attend_df: pd.DataFrame, csv_path: str | Path) -> Path:
+    csv_path = Path(csv_path)
+    csv_df = attend_df_to_csv_df(attend_df)
+    csv_df.to_csv(csv_path, index=False, encoding="utf-8-sig", columns=CSV_COLUMNS)
+    print(f"CSVを保存しました: {csv_path}")
+    return csv_path
+
+
+def export_attend_csv_from_excel(file_path: str, csv_path: str | Path | None = None) -> Path:
+    attend_df = read_attend_sheet(file_path, ATTEND_SHEET_NAME)
+    if attend_df.empty:
+        print(f"エラー: {ATTEND_SHEET_NAME} にデータがありません")
+        return Path(csv_path) if csv_path else default_csv_path(file_path)
+
+    output_path = Path(csv_path) if csv_path else default_csv_path(file_path)
+    return export_attend_csv(attend_df, output_path)
+
+
 def output_to_new_sheet(file_path, result_df, attend_df):
     # できたスケジュールを元のExcelに作成した新シートに出力する
     new_sheet_name = "今月の講座一覧表"
-    attend_sheet_name = "参加講座一覧表"
-    with pd.ExcelWriter(
-        file_path, mode="a", engine="openpyxl", if_sheet_exists="replace"
-    ) as writer:
-        result_df.to_excel(writer, sheet_name=new_sheet_name, index=False)
-        print(f"{new_sheet_name}に保存しました")
-
     with pd.ExcelWriter(
         file_path,
         mode="a",
         engine="openpyxl",
         if_sheet_exists="replace",
         datetime_format="yyyy/mm/dd hh:mm",
-        # date_format="yyyy/mm/dd",
+        date_format="yyyy/mm/dd",
     ) as writer:
-        attend_df.to_excel(writer, sheet_name=attend_sheet_name, index=False)
-        print(f"{attend_sheet_name}に保存しました")
+        result_df.to_excel(writer, sheet_name=new_sheet_name, index=False)
+        attend_df.to_excel(writer, sheet_name=ATTEND_SHEET_NAME, index=False)
+        print(f"{new_sheet_name}に保存しました")
+        print(f"{ATTEND_SHEET_NAME}に保存しました")
