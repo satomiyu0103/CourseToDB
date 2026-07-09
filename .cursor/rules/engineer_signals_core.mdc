@@ -1,0 +1,33 @@
+---
+description: 実装時のエンジニアシグナル下限（C 回避・レビュー負荷抑制）
+globs: src/**,tests/**,scripts/**
+alwaysApply: false
+---
+
+# エンジニアシグナル（下限）
+
+Kent Beck 型の B/C 境界。価値検証・差分計画の手順は [task-value-first/SKILL.md](../skills/task-value-first/SKILL.md) が正本。
+
+## C シグナル（禁止）
+
+- 未検証の完了報告（テスト未実行・動作未確認）
+- 巨大な単一 diff（[git_workflow](git_workflow.mdc) §PR 粒度違反。目安 300 行超の 1 コミット）
+- 同種ミスの再発（[試験実装のエラー.md](../../doc/ai/guidelines/試験実装のエラー.md) 未参照）
+- スコープ外の無断改修（[agent_core](agent_core.mdc) と併用）
+
+## B の最低ライン
+
+- **着手前**: 何をするか 1 段落で共有する
+- **完了時**: 妥当な時間内・動作確認・テスト
+- **周囲の負担**: レビューしやすい差分、既存パターン踏襲
+
+## 委譲（重複定義しない）
+
+| 内容 | 正本 |
+|---|---|
+| 禁止事項・CHANGELOG 義務 | `agent_core.mdc` |
+| 命名・コメント・テスト | 各 Rule（`naming_conventions` 等） |
+| PR 粒度・atomic commit | `git_workflow.mdc` |
+| 価値検証・差分計画 | `task-value-first` Skill |
+
+同じ C シグナルを二度送らない。発生時は sessions の `## 学び` または known-error-entry で再発防止を残す。

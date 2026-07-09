@@ -1,0 +1,40 @@
+---
+description: プロジェクト概要・必読 doc・FR/NFR 採番体系
+alwaysApply: true
+---
+
+# プロジェクト前提
+
+**{{PROJECT_DESCRIPTION}}**（テンプレ適用後に `{{PROJECT_DESCRIPTION}}` を置換）。
+
+## Agent テンプレ clone
+
+| 項目 | パス |
+|---|---|
+| **同期・commit の正本** | 各プロジェクトのワークスペースルート `ai-agent-devenv-template/` |
+| **参照しない** | ワークスペース外の同名 clone（[workspace_boundary](workspace_boundary.mdc)・[template_sync](template_sync.mdc)） |
+
+## Phase 1 必読（仕様・機能に触れる実装）
+
+1. `doc/specs/02_要件定義.md` — MoSCoW・FR/NFR
+2. `doc/specs/04_機能一覧.md` — 実装状況・採番ルール
+3. `doc/ai/guidelines/試験実装のエラー.md` — 既知エラー
+
+1 行修正・typo・パス明示の限定変更は上記 3 件を省略可。
+
+## FR / NFR コード
+
+`[TYPE]-[CATEGORY]-[NNN]` — 詳細・FR カテゴリ定義は `doc/specs/04_機能一覧.md`
+
+| TYPE | 意味 |
+|---|---|
+| FR | 機能要件 |
+| NFR | 非機能要件 |
+
+| CATEGORY (NFR) | SEC / PERF / OPS |
+
+NNN: カテゴリ内連番（001〜）。欠番は振り直さない。
+
+## specs 番号（利用者向けライフサイクル）
+
+00 概要 → 01 ギャップ → 02 要件 → 03 設計 → 04 機能一覧 → 05 ディレクトリ → 06 ROADMAP → 07 CHANGELOG

@@ -1,0 +1,36 @@
+---
+description: コードコメント・docstring（Why/What の明示）
+globs: src/**
+alwaysApply: false
+---
+
+# コードコメント
+
+新規・変更コードには **意図（Why）と処理内容（What）** を残す。
+
+## 記載すること
+
+| 種類 | 内容 |
+|---|---|
+| Why | 手法・分岐・定数値を選んだ理由 |
+| What | 入力から出力までの処理 |
+| 前提 | データ形式・API 仕様・固定値の理由 |
+| 過去の対処 | 既知バグ回避と根拠 |
+
+## 書き方
+
+- 関数・クラス: docstring に目的（1 文）と非自明な要点
+- 分岐・ループ・例外・ワークアラウンド直前に 1 行コメント
+- 自明なコード（import、getter、1 行代入）は不要
+- コメントは**日本語**、コード変更時に同期更新
+
+## ジュニア向けブロックコメント（`src/` 新規・変更時）
+
+`if` / `for` / `while` / `try` の**非自明なブロック**には、Why（なぜここか）と What（何をするか）を残す。  
+`try/except` は失敗時の扱い（続行・スキップ・全体中止）を必ず書く。
+
+- **可読性**: 毎回 `【何を】` ラベルは使わない。一文リード・見出し＋補足・例外の箇条書きなど、文脈に合うパターンを選ぶ
+- **例文・パターン一覧**: [`.cursor/skills/junior-code-comments/SKILL.md`](../skills/junior-code-comments/SKILL.md)
+- **見本ファイル**: `src/notion_gcal_sync/clients/gcal_body.py`
+
+コミットメッセージも**日本語**（`git_workflow` の Conventional Commits 接頭辞は可）。

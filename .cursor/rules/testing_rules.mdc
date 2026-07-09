@@ -1,0 +1,24 @@
+---
+description: テスト配分・配置・実行コマンド
+globs: src/**,tests/**
+alwaysApply: false
+---
+
+# テスト規約
+
+## 配分
+
+- Unit 70%（ドメインロジック・変換）
+- Integration 30%（外部 API モック込み結合）
+
+## ルール
+
+- 新規ロジックには最低 1 件の unit test
+- 外部 API 直接呼び出しは `tests/integration/` のみ
+- `tests/unit/` では外部 API 禁止（モック／スタブ）
+
+## 実行
+
+採用スタックのテストフレームワークに従う。コマンドは `doc/reference/setup/` または `doc/specs/05_ディレクトリ構成.md` に記載する。
+
+MVP 最低ライン: `doc/ai/guidelines/checklists/implementation.md` §C

@@ -1,0 +1,45 @@
+---
+description: 日本語技術文書の文章規範（いつ・どう適用するか）
+globs: doc/**,.cursor/doc/**,.cursor/skills/**,AGENTS.md,README.md
+alwaysApply: false
+---
+
+# 日本語技術文書（適用タイミング）
+
+正本: [`.cursor/skills/japanese-tech-writing/SKILL.md`](../skills/japanese-tech-writing/SKILL.md)  
+出典: [ATTRIBUTION.md](../skills/japanese-tech-writing/ATTRIBUTION.md)
+
+`documentation_wording.mdc`（利用者・開発者の呼び方）と併用する。表記は前者、段落・論証・文体は本 Skill に従う。
+
+## いつ読むか（必須）
+
+次のいずれかに該当するとき、**執筆・改稿の前に** Skill を読む。
+
+| タイミング | 例 |
+|---|---|
+| `doc/` の日本語本文を新規作成する | 要件・設計の説明段落、ガイドライン本文 |
+| 既存の日本語本文を **段落単位以上** で改稿・推敲・リライトする | 節の書き直し、論理構成の見直し |
+| `doc/ai/sessions/` の本文を書く | 背景・意思決定・サマリの叙述部 |
+| `.cursor/skills/` の説明文・手順本文を **新規または大幅** に書く | SKILL 本文の追加改訂 |
+| 利用者が日本語の技術文の品質・文体の改善を依頼したとき | 「読みやすく」「LLM っぽくない」等 |
+
+## いつ読まないか（省略可）
+
+| 対象 | 理由 |
+|---|---|
+| CHANGELOG の 1 行サマリ、FR コード表、目次・索引のみ | 台帳・構造データ |
+| 1 行の typo・パス・日付の修正 | 文体規範の対象外 |
+| コードコメント・識別子・設定値 | `code_comments.mdc` 等が優先 |
+| 英語のみの記述 | 本 Skill は日本語向け |
+| チャットでの短い説明（コミット未反映） | リポジトリ成果物ではない |
+
+## どう適用するか
+
+1. **着手前**: `japanese-tech-writing/SKILL.md` を読む。
+2. **執筆中**: 一文一行・段落の一トピック・論証の一方向を守る。利用者表記は `documentation_wording.mdc` に合わせる。
+3. **完了前**: Skill の「LLM っぽい表現の禁止」「冗長の排除」「論証の厳密さ」を点検する。
+4. **Phase 3**: `phase3-doc-updates` 実行時、上記「必須」に該当する doc 変更があれば本ルールに従ったことを確認する。
+
+## 原本の更新
+
+Skill 本文は [k16shikano の Gist](https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d) 由来（Unlicense）。差分取り込み時は `ATTRIBUTION.md` の原本 URL と照合する。

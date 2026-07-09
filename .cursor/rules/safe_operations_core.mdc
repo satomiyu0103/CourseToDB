@@ -1,0 +1,25 @@
+---
+description: バッチ・自動化の設計原則とログ必須項目
+globs: src/**,scripts/**
+alwaysApply: false
+---
+
+# 安全運用（コア）
+
+## 設計原則
+
+1. 観測可能 — run_id・段階・件数が追える
+2. 境界付き — 件数・時間・API 回数に上限
+3. 失敗を局所化 — 1 件失敗で全体を落とすかは要件で明示
+4. 安全な縮退 — 枠不足時は打ち切り・スキップ・再試行可能な残し
+5. 利用者に届く — 復旧に必要な情報だけ通知
+
+## ログ必須項目
+
+run_id / stage / 対象 ID / 結果 / 時刻 / 件数サマリ（processed・skipped・failed）
+
+## ログに書かない
+
+API キー・トークン・パスワード / 個人情報全文 / 巨大ペイロード全文
+
+詳細: `.cursor/skills/safe-operations-detail/SKILL.md`

@@ -1,0 +1,16 @@
+---
+description: 外部 API 呼び出しの必須パターン
+globs: src/**,scripts/**
+alwaysApply: false
+---
+
+# 外部 API
+
+失敗が前提の設計にする。
+
+- フィルタは API 側でかける（全件取得後の手元フィルタ禁止）
+- リトライは指数バックオフ（1s, 2s, 4s …）
+- タイムアウトを必ず設定（無制限禁止）
+- レスポンスは型変換してドメインモデルに詰め替えてから使う
+
+バッチ・通知・処理量の詳細: `.cursor/skills/safe-operations-detail/SKILL.md`

@@ -1,0 +1,140 @@
+---
+description: ai-agent-devenv-template/ との共有ファイル変更時はテンプレ側も同期
+alwaysApply: true
+---
+
+# テンプレート同期
+
+## 目的
+
+`ai-agent-devenv-template` は各プロジェクト開始時に **ワークスペースルートへ git clone する正本** である。プロジェクト間で Agent AI の運用（Rules・Skills・ログ手順）を同じ形に揃える。
+
+## 正本パス（本ワークスペースのみ）
+
+| 項目 | 内容 |
+|---|---|
+| **唯一の同期先** | ワークスペースルート直下 `ai-agent-devenv-template/`（相対パスのみ） |
+| **禁止** | 親ディレクトリ・兄弟フォルダ等、ワークスペース外の同名 clone への Read / Grep / Shell / 同期 / commit（利用者が比較用にパスを明示した場合を除く） |
+| **`.gitignore`** | 本フォルダはプロジェクト git では追跡しないが **ディスク上に存在しうる**。Glob 0 件でも「無い」と断定しない |
+
+### 存在確認（同期・締めの前）
+
+検索ツールで見つからなくても、Shell で次を確認する（PowerShell 例）:
+
+```powershell
+Test-Path ai-agent-devenv-template\.git
+```
+
+`True` なら同期義務あり。`False` のみ未配置として扱い、利用者へ clone 手順を報告する（黙ってスキップしない）。
+
+### 正本リポジトリ単体で作業するとき
+
+ワークスペースが **本リポジトリ（`ai-agent-devenv-template`）そのもの** のとき、ネストした `ai-agent-devenv-template/` は不要である。変更は本リポジトリへ直接 commit する。`template_sync` の「ルート → テンプレへコピー」は、業務プロジェクト内にテンプレ clone がある場合に適用する。
+
+`ai-agent-devenv-template/` が存在する場合、**テンプレ由来の共有ファイル**をルートで変更・追加したら、**同一ターン内**（タスク完了報告前）にテンプレ側へ同旨の更新を行う。省略は利用者が「テンプレは触らない」と明示した場合のみ。
+
+## ワークスペース一括同期（Documents 秘書層）
+
+Documents ワークスペースでは、テンプレ → 各プロジェクトの配布を `Documents/.cursor/scripts/sync-dev-template.ps1` が担う。
+
+| ファイル | 役割 |
+|---|---|
+| `TEMPLATE_VERSION.json`（テンプレルート） | テンプレ世代の正本。**同期対象を変更したら version / updated を更新する（省略不可）** |
+| `sync-manifest.json`（テンプレルート） | 同期対象の定義（overwrite / copy_if_missing / exclude）。同期対象パスを増減したらここも更新する |
+| 展開先 `.cursor/.template-version.json` | 適用済みテンプレ世代のスタンプ（スクリプトが書き込む。手動編集しない） |
+
+本 rule の「同一ターン内のテンプレ反映」義務は従来どおり。一括同期は反映済みテンプレを他プロジェクトへ配るための仕組みであり、テンプレへの反映を置き換えるものではない。
+
+## 同期義務（常時・省略不可）
+
+### いつ同期するか
+
+`ai-agent-devenv-template/` がワークスペースに存在するとき、**同期対象パスを 1 行でも変更・追加・削除したら**、ルート側の編集完了直後にテンプレへ反映する。
+
+| タイミング | 必須 |
+|---|---|
+| 同期対象ファイルの編集直後 | ○（同一ターン内） |
+| memory_stream / sessions / 開発日誌索引の追記直後 | ○ |
+| タスク完了報告の直前 | ○（未同期なら報告しない） |
+| セッション終了（「終了」等） | ○ + テンプレリポジトリ commit / push |
+
+### エージェントの手順（変更のたび）
+
+1. ルート側の変更を完了する
+2. [同期対象](#同期対象ルート--ai-agent-devenv-template) に該当するか判定する
+3. 該当すれば **即座に** 同一相対パスを `ai-agent-devenv-template/` へコピー（または同内容で編集）
+4. `ai-agent-devenv-template/` で `git status` を確認し、意図しない業務固有ファイルの混入がないことを見る
+5. セッション終了時は [memory_logger.mdc](memory_logger.mdc) の締めでテンプレも commit / push
+
+### コピー除外（プレースホルダ維持）
+
+| ファイル | 扱い |
+|---|---|
+| `project_identity.mdc` | 構造・パス参照のみ手動追従。**本文の `{{PROJECT_DESCRIPTION}}` 等は上書きしない** |
+| `doc/specs/07_CHANGELOG.md` | 運用基盤行のみ追記。業務実装行はコピーしない |
+| `doc/specs/` の要件・設計・機能一覧 | 業務記述はコピーしない（パス構造変更時はテンプレ側を個別更新） |
+
+### 完了チェック（同期対象を触ったタスク）
+
+- [ ] 同期対象の変更をテンプレの同一パスへ反映済み
+- [ ] `project_identity.mdc` のプレースホルダを壊していない
+- [ ] テンプレ `git status` で差分が意図どおり
+
+## 同期対象（ルート ↔ `ai-agent-devenv-template/`）
+
+| パス | 備考 |
+|---|---|
+| `.cursor/rules/` `.cursor/skills/` | エージェント基盤。構造・手順の追加変更 |
+| `scripts/agent-capabilities-manifest.json` `scripts/update-agent-capabilities-index.ps1` | skill / MCP 出典台帳 |
+| `doc/agent/agent-capabilities.md` | 上記 manifest から生成される一覧 |
+| `.cursor/doc/memory_stream.md` | 運用定義および **ファクト追記を含む全文** |
+| `doc/ai/` | README・runtime・decisions 索引・guidelines・sessions |
+| `doc/specs/00_開発日誌.md` | 索引・日次エントリ（記入ルールセクションはテンプレ側で維持） |
+| `AGENTS.md` | クイックリファレンス |
+
+## ログ更新時の同期（必須）
+
+`ai-agent-devenv-template/` が存在するとき、次を **プロジェクトとテンプレの両方** に反映する。
+
+| トリガー | 同期先（同一相対パス） |
+|---|---|
+| memory_logger によるファクト追記 | `.cursor/doc/memory_stream.md` |
+| agent-session-record / design-decision-record によるセッション記録 | `doc/ai/sessions/YYYY-MM-DD_*.md` |
+| 開発日誌索引の追記 | `doc/specs/00_開発日誌.md` |
+
+上記は **プロジェクト側の記録完了直後** にテンプレへコピーする。
+
+## セッション終了時の commit / push
+
+[memory_logger.mdc](memory_logger.mdc) の **セッション終了時の締め** に従う。ログ同期のあと:
+
+1. プロジェクトリポジトリ（ルート）を commit / push
+2. `ai-agent-devenv-template/` に変更があれば同リポジトリ内で commit / push
+
+変更が無いリポジトリはスキップする。`.env` 等の秘密ファイルは add しない。
+
+## ログ更新時の同期（運用基盤のみ）
+
+| 種別 | テンプレ同期 | 例 |
+|---|---|---|
+| 運用基盤 | **する** | `memory_logger.mdc` / `agent-session-record` / `design-decision-record` SKILL の改訂、`doc/ai/` 構造、`00_開発日誌.md` の **記入ルール** セクション |
+| 業務固有データ | **しない** | `doc/specs/07_CHANGELOG.md` の業務実装行、`gas/` `src/`、商品 PDF 等 reference |
+
+## 手順
+
+1. ルート側の変更を完了する
+2. 同一相対パスを `ai-agent-devenv-template/` に反映（コピーまたは同内容で編集）
+3. テンプレ側は `{{PROJECT_DESCRIPTION}}`・`{{LAST_UPDATED}}` 等の **プレースホルダを維持**（`project_identity.mdc` 等）
+4. `00_開発日誌.md` はテンプレの **記入ルール** セクションを残し、日次エントリを追記同期する
+5. 運用基盤を変えた場合はテンプレの `doc/specs/07_CHANGELOG.md` にも該当行を追記する
+
+## 同期しない（プロジェクト固有）
+
+- `gas/` `src/`（業務実装）・`config/.env`
+- `doc/specs/07_CHANGELOG.md` の業務内容（運用基盤変更行を除く）
+- `doc/specs/` の要件・設計・機能一覧の業務記述
+- 商品 PDF 等プロジェクト専用の reference / migration 資料
+
+## 判定
+
+「テンプレにも同パスが存在するか」を確認。存在すれば同期必須。ユーザーが「テンプレは触らない」と明示した場合のみ省略可。

@@ -1,0 +1,40 @@
+---
+description: skill / MCP 変更時に agent-capabilities 一覧 Markdown を自動再生成する
+alwaysApply: true
+---
+
+# Agent Capabilities Index（能力一覧の自動更新）
+
+## 対象
+
+| ソース | 出力（正本） |
+|---|---|
+| `.cursor/skills/` `skills-lock.json` | [doc/agent/agent-capabilities.md](../../doc/agent/agent-capabilities.md) |
+
+manifest 正本: [agent-capabilities-manifest.json](../../scripts/agent-capabilities-manifest.json)
+
+## トリガー（いずれかで再生成）
+
+1. `.cursor/skills/` の **追加・削除・リネーム・実質的な変更**
+2. `skills-lock.json` の変更（`npx skills add` 後）
+3. manifest の `entries` / `mcp` 編集
+4. [template_sync](template_sync.mdc) による同期時
+
+## 手順（同一ターン内・確認待ち禁止）
+
+1. 新規 skill には manifest に `origin` / `provenance` を追記する
+2. 以下を実行する:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/update-agent-capabilities-index.ps1
+```
+
+3. 生成 MD を確認する。「未登録」があれば manifest を追記して再実行
+
+## MCP 記録の制約
+
+[gdrive_mcp_core](gdrive_mcp_core.mdc) に従う。認証情報・個人情報本文は manifest に書かない。
+
+## 参照
+
+- 手順 skill: [agent-capabilities-index](../skills/agent-capabilities-index/SKILL.md)

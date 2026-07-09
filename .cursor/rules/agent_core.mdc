@@ -1,0 +1,45 @@
+---
+description: 全チャット向けの禁止事項と実装完了時の最低義務（常時適用）
+alwaysApply: true
+---
+
+# エージェント憲法（常時）
+
+**「自動更新」**: CI ではなく、**実装タスク完了時にエージェントが doc を更新する義務**を指す。該当しない変更は無理に全ファイルを更新しない。
+
+## 禁止事項
+
+- `.env` や秘密情報（API キー・パスワード等）をコード・ログ・チャットに出力すること
+- 既存テストを壊す変更を無断で行うこと
+- タスクスコープ外のリファクタ・機能追加を行うこと
+- ワークスペース外・別プロジェクトの調査・実装（利用者の明示なし）→ [workspace_boundary.mdc](workspace_boundary.mdc)
+- 実装タスク完了後に CHANGELOG 記入を省略すること
+
+## 実装タスク完了時（最低限）
+
+- `doc/specs/07_CHANGELOG.md` の `[Unreleased]` に **FR コード付き** 1 行（手順: `.cursor/skills/changelog-entry/SKILL.md`）
+- チャットで実装完了 → `.cursor/skills/agent-session-record/SKILL.md` に従う
+- タスク完了時 → `.cursor/rules/memory_logger.mdc` に従い `.cursor/doc/memory_stream.md` へファクト追記
+- **セッション終了**（「終了」等）→ `memory_logger.mdc` の **締め** に従いテンプレ同期・commit・push まで実施
+- 共有ファイル・ログ運用基盤の変更時 → [`.cursor/rules/template_sync.mdc`](template_sync.mdc) に従い **同一ターン内** に `ai-agent-devenv-template/` を同期（省略不可）
+
+## 実装着手時
+
+`src/`・`doc/`・`tests/`・`scripts/` を変更する作業では [`.cursor/rules/agent_implement_entry.mdc`](agent_implement_entry.mdc) が追加適用される。
+
+## 参照早引き
+
+| 目的 | 参照先 |
+|---|---|
+| プロジェクト概要・FR コード | `.cursor/rules/project_identity.mdc` |
+| Phase 1〜3 手順 | `.cursor/skills/implementation-phase1/` 〜 `phase3-doc-updates/` |
+| 開発ルール（命名・Git・テスト） | `.cursor/rules/` 各ファイル |
+| doc 索引（利用者向け） | `doc/ai/README.md` / `doc/ai/guidelines/Project_map.md` |
+| ドキュメント表記 | `.cursor/rules/documentation_wording.mdc` |
+| チャット用語解説（ジュニア向け） | `.cursor/rules/junior_friendly_explanations.mdc` → `junior-friendly-explanations/SKILL.md` |
+| コードブロックコメント（ジュニア向け） | `.cursor/rules/code_comments.mdc` → `junior-code-comments/SKILL.md` |
+| 日本語技術文書 | `.cursor/rules/japanese_tech_writing.mdc` → `japanese-tech-writing/SKILL.md` |
+| テンプレ同期 | `.cursor/rules/template_sync.mdc` |
+| ワークスペース境界 | `.cursor/rules/workspace_boundary.mdc` |
+| Google Drive MCP（個人情報参照） | `.cursor/skills/gdrive-mcp/SKILL.md` → `gdrive_mcp_core.mdc` |
+| skill / MCP 出典一覧 | `doc/agent/agent-capabilities.md` → [agent-capabilities-index](../skills/agent-capabilities-index/SKILL.md) |

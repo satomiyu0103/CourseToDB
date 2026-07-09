@@ -1,0 +1,304 @@
+{
+  "version": 1,
+  "scope": "ai-agent-devenv",
+  "title": "エージェント能力一覧（ai-agent-devenv-template）",
+  "description": "汎用 AI 駆動開発テンプレの skill / MCP 出典台帳。",
+  "manifest_path": "scripts/agent-capabilities-manifest.json",
+  "output": "doc/agent/agent-capabilities.md",
+  "scan": {
+    "skill_dirs": [".cursor/skills"],
+    "skills_lock": ["skills-lock.json"]
+  },
+  "labels": {
+    "manifest_prefix": "正本 manifest",
+    "generated_prefix": "自動生成",
+    "edit_hint": "概要・由来の手動編集: scripts/agent-capabilities-manifest.json",
+    "skills_heading": "Skills",
+    "reference_heading": "参照のみ",
+    "mcp_heading": "MCP（推奨・参照）",
+    "unregistered_heading": "未登録（要 manifest 追記）",
+    "rules_heading": "更新ルール",
+    "col_name": "名前",
+    "col_summary": "概要",
+    "col_origin": "由来",
+    "col_provenance": "出典性質",
+    "col_source": "出典",
+    "col_path": "パス",
+    "col_scope": "スコープ",
+    "col_status": "状態",
+    "col_policy": "方針",
+    "rule1": ".cursor/skills/ 変更時は manifest を更新してからスクリプトを実行する",
+    "rule2": "npx skills add 後は skills-lock.json と manifest を同期する",
+    "rule3": "template_sync 時に manifest / script / 本一覧を同期する",
+    "origin_self": "自作",
+    "origin_adapted": "参考作成",
+    "origin_imported": "インポート",
+    "provenance_personal": "個人",
+    "provenance_organization": "組織",
+    "provenance_official": "公式",
+    "policy_readonly_default": "readonly 既定",
+    "source_self_default": "自作"
+  },
+  "entries": {
+    "agent-capabilities-index": {
+      "kind": "skill",
+      "summary": "skill / MCP 出典台帳の再生成・更新",
+      "origin": "self",
+      "provenance": "personal",
+      "source_label": "テンプレ自作",
+      "status": "active"
+    },
+    "agent-session-record": {
+      "kind": "skill",
+      "summary": "実装セッション記録（doc/ai/sessions/）",
+      "origin": "self",
+      "provenance": "personal",
+      "source_label": "テンプレ自作",
+      "status": "active"
+    },
+    "audit-documentation": {
+      "kind": "skill",
+      "summary": "ドキュメント監査チェックリスト実行",
+      "origin": "self",
+      "provenance": "personal",
+      "source_label": "テンプレ自作",
+      "status": "active"
+    },
+    "audit-implementation": {
+      "kind": "skill",
+      "summary": "実装・品質監査チェックリスト",
+      "origin": "self",
+      "provenance": "personal",
+      "source_label": "テンプレ自作",
+      "status": "active"
+    },
+    "audit-operations": {
+      "kind": "skill",
+      "summary": "運用・バッチ監査チェックリスト",
+      "origin": "self",
+      "provenance": "personal",
+      "source_label": "テンプレ自作",
+      "status": "active"
+    },
+    "audit-post-prototype": {
+      "kind": "skill",
+      "summary": "プロトタイプ後の総合監査",
+      "origin": "self",
+      "provenance": "personal",
+      "source_label": "テンプレ自作",
+      "status": "active"
+    },
+    "audit-refactor-full": {
+      "kind": "skill",
+      "summary": "リファクタ後の総合再監査",
+      "origin": "self",
+      "provenance": "personal",
+      "source_label": "テンプレ自作",
+      "status": "active"
+    },
+    "audit-refactoring": {
+      "kind": "skill",
+      "summary": "リファクタリング監査チェックリスト",
+      "origin": "self",
+      "provenance": "personal",
+      "source_label": "テンプレ自作",
+      "status": "active"
+    },
+    "audit-security": {
+      "kind": "skill",
+      "summary": "セキュリティ監査チェックリスト",
+      "origin": "self",
+      "provenance": "personal",
+      "source_label": "テンプレ自作",
+      "status": "active"
+    },
+    "changelog-entry": {
+      "kind": "skill",
+      "summary": "CHANGELOG Unreleased への FR コード付き記入",
+      "origin": "self",
+      "provenance": "personal",
+      "source_label": "テンプレ自作",
+      "status": "active"
+    },
+    "d-format-code-guide": {
+      "kind": "skill",
+      "summary": "D 形式コード解説ファイルの作成",
+      "origin": "self",
+      "provenance": "personal",
+      "source_label": "テンプレ自作",
+      "status": "active"
+    },
+    "design-decision-record": {
+      "kind": "skill",
+      "summary": "設計判断の記録（ADR 型）",
+      "origin": "self",
+      "provenance": "personal",
+      "source_label": "テンプレ自作",
+      "status": "active"
+    },
+    "gdrive-mcp": {
+      "kind": "skill",
+      "summary": "Google Drive MCP 利用手順",
+      "origin": "self",
+      "provenance": "personal",
+      "source_label": "テンプレ自作",
+      "status": "active",
+      "notes": "dylancaponi/gdrive-mcp-server 向け手順"
+    },
+    "implementation-phase1": {
+      "kind": "skill",
+      "summary": "実装着手前の doc 読取（Phase 1）",
+      "origin": "self",
+      "provenance": "personal",
+      "source_label": "テンプレ自作",
+      "status": "active"
+    },
+    "implementation-phase2": {
+      "kind": "skill",
+      "summary": "実装中の手順（Phase 2）",
+      "origin": "self",
+      "provenance": "personal",
+      "source_label": "テンプレ自作",
+      "status": "active"
+    },
+    "japanese-chat-mary": {
+      "kind": "skill",
+      "summary": "チャット口調（です・ます調）",
+      "origin": "self",
+      "provenance": "personal",
+      "source_label": "テンプレ自作",
+      "status": "active"
+    },
+    "japanese-tech-writing": {
+      "kind": "skill",
+      "summary": "日本語技術文書の推敲規範",
+      "origin": "adapted",
+      "provenance": "personal",
+      "source_label": "社内規範ベース",
+      "status": "active"
+    },
+    "junior-code-comments": {
+      "kind": "skill",
+      "summary": "ジュニア向けブロックコメント付与",
+      "origin": "self",
+      "provenance": "personal",
+      "source_label": "テンプレ自作",
+      "status": "active"
+    },
+    "junior-friendly-explanations": {
+      "kind": "skill",
+      "summary": "ジュニア向け平易な説明",
+      "origin": "self",
+      "provenance": "personal",
+      "source_label": "テンプレ自作",
+      "status": "active"
+    },
+    "known-error-entry": {
+      "kind": "skill",
+      "summary": "既知エラー集への登録",
+      "origin": "self",
+      "provenance": "personal",
+      "source_label": "テンプレ自作",
+      "status": "active"
+    },
+    "phase3-doc-updates": {
+      "kind": "skill",
+      "summary": "実装完了後の doc 更新（Phase 3）",
+      "origin": "self",
+      "provenance": "personal",
+      "source_label": "テンプレ自作",
+      "status": "active"
+    },
+    "records-split": {
+      "kind": "skill",
+      "summary": "doc/ai/sessions/ の分割・移動",
+      "origin": "self",
+      "provenance": "personal",
+      "source_label": "テンプレ自作",
+      "status": "active"
+    },
+    "refactoring-report": {
+      "kind": "skill",
+      "summary": "リファクタリング報告フォーマット",
+      "origin": "self",
+      "provenance": "personal",
+      "source_label": "テンプレ自作",
+      "status": "active"
+    },
+    "safe-operations-detail": {
+      "kind": "skill",
+      "summary": "バッチ・自動化の安全運用手順",
+      "origin": "self",
+      "provenance": "personal",
+      "source_label": "テンプレ自作",
+      "status": "active"
+    },
+    "task-value-first": {
+      "kind": "skill",
+      "summary": "実装前の価値検証・Tidy First 型計画",
+      "origin": "adapted",
+      "provenance": "personal",
+      "source": "Tidy First",
+      "source_label": "Tidy First 参考",
+      "status": "active"
+    },
+    "agent-governance": {
+      "kind": "skill",
+      "summary": "AI エージェントのガバナンス・安全統制",
+      "origin": "imported",
+      "provenance": "organization",
+      "source": "github/awesome-copilot",
+      "source_label": "github/awesome-copilot",
+      "status": "active"
+    },
+    "agent-owasp-compliance": {
+      "kind": "skill",
+      "summary": "OWASP ASI Top 10 準拠チェック",
+      "origin": "imported",
+      "provenance": "organization",
+      "source": "github/awesome-copilot",
+      "source_label": "github/awesome-copilot",
+      "status": "active"
+    },
+    "llm-security": {
+      "kind": "skill",
+      "summary": "LLM アプリセキュリティガイドライン",
+      "origin": "imported",
+      "provenance": "organization",
+      "source": "semgrep/skills",
+      "source_label": "semgrep/skills",
+      "status": "active"
+    },
+    "mcp-security-audit": {
+      "kind": "skill",
+      "summary": "MCP 設定のセキュリティ監査",
+      "origin": "imported",
+      "provenance": "organization",
+      "source": "github/awesome-copilot",
+      "source_label": "github/awesome-copilot",
+      "status": "active"
+    },
+    "owasp-agentic": {
+      "kind": "skill",
+      "summary": "OWASP Agentic Security Top 10",
+      "origin": "imported",
+      "provenance": "official",
+      "source": "microsoft/hve-core",
+      "source_label": "microsoft/hve-core (OWASP ASI)",
+      "status": "active"
+    }
+  },
+  "mcp": {
+    "gdrive-mcp-server": {
+      "summary": "Google Drive 参照（個人情報正本）。推奨 MCP。",
+      "origin": "imported",
+      "provenance": "organization",
+      "source": "dylancaponi/gdrive-mcp-server",
+      "source_label": "dylancaponi/gdrive-mcp-server",
+      "readonly_default": true,
+      "policy_ref": ".cursor/rules/gdrive_mcp_core.mdc",
+      "skill_ref": ".cursor/skills/gdrive-mcp/SKILL.md",
+      "status": "active"
+    }
+  }
+}

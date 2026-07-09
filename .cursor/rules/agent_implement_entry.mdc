@@ -1,0 +1,23 @@
+---
+description: コード・仕様変更時の Phase 入口（agent_core と併用）
+globs: src/**,doc/**,tests/**,scripts/**,config/**
+alwaysApply: false
+---
+
+# 実装タスク入口
+
+`agent_core.mdc` の禁止事項に加え、以下の Skills を **Phase 順に** 読み実行する。
+
+| Phase | Skill |
+|:---:|---|
+| 1 着手前 | `.cursor/skills/implementation-phase1/SKILL.md` → 続けて `.cursor/skills/task-value-first/SKILL.md`（A-0・A-1） |
+| 2 実施中 | `.cursor/skills/implementation-phase2/SKILL.md`（`task-value-first` A-2 と `engineer_signals_core` を併用） |
+| 3 完了後 | `.cursor/skills/phase3-doc-updates/SKILL.md` |
+
+参照先が存在しない・読めない場合は中断し、ユーザーに通知する。
+
+**常時適用の制約**（Skills より優先）: `naming_conventions` / `git_workflow` / `code_comments` / `testing_rules` / `external_api` / `god_class_watch` / `safe_operations_core` / `src_readme_policy`
+
+## テンプレ同期（同期対象変更時）
+
+[`.cursor/rules/template_sync.mdc`](template_sync.mdc) の同期対象パス（`.cursor/rules/`・`.cursor/skills/`・`doc/ai/`・`AGENTS.md` 等）を編集したら、**Phase 3 完了報告前**に `ai-agent-devenv-template/` へ反映する。利用者が「テンプレは触らない」と明示した場合のみ省略可。

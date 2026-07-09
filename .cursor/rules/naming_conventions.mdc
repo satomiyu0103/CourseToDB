@@ -1,0 +1,46 @@
+---
+description: コード・英語パスの命名規約（変数・関数・フォルダ）
+globs: src/**,tests/**,scripts/**
+alwaysApply: false
+---
+
+# 命名規約
+
+## 全言語共通（必須）
+
+`snake_case` / `camelCase` の別より **優先** する原則。
+
+| 原則 | 内容 |
+|---|---|
+| 語彙 | 日本の小中学生レベルの平易な英単語（例: Force より Power） |
+| 構成 | 何の何か・誰が何をするかが分かる複合名（例: `list_fruits`, `readPdfFile`, `product_name`） |
+| 禁止 | 単体では意味が不明な `data`, `temp`, `process`, `handle` 等 |
+
+## ケーススタイル（言語のマジョリティに従う）
+
+形式は **各言語・実行環境の慣習** に合わせる。上記の語彙・構成原則はケースに関わらず必須。
+
+| 言語・対象 | 慣習 | 例 |
+|---|---|---|
+| Python 変数・関数 | `snake_case` | `read_pdf_file`, `product_name` |
+| Python クラス | `PascalCase` | `ProductRecord` |
+| Python 定数 | `UPPER_SNAKE_CASE` | `MAX_RETRY_COUNT` |
+| Python 例外クラス | `PascalCase` + `Exception` | `PdfReadException` |
+| GAS 公開関数 | `camelCase` | `processAllPendingPdfs` |
+| GAS 内部ヘルパー | `camelCase` + 末尾 `_` | `extractProductFromPdf_` |
+| GAS モジュールファイル | `snake_case.js` 等 | `gemini.js`, `main.js` |
+| JSON / シート列キー | `snake_case`（`schema.js` 正本） | `product_name`, `jan_code` |
+| Script Properties キー | `SCREAMING_SNAKE_CASE` | `GEMINI_API_KEY` |
+
+詳細・一覧: `doc/specs/05_ディレクトリ構成.md` の命名規則。
+
+テスト関数（Python）: `test_{対象}_{期待結果}`（例: `test_differ_detects_created_events`）
+
+## フォルダ・パッケージ（英語で名付ける場合）
+
+英語ディレクトリ名にも **語彙・構成の共通原則** を適用する。形式は当該スタックの慣習に従う（本リポジトリでは `snake_case` が主）。
+
+- 良い例: `pdf_input/`, `product_labels/`, `test_fixtures/`
+- 悪い例: `misc/`, `stuff/`, `new_folder/`
+
+**対象外**（慣習名・番号付き doc を維持）: `doc/`, `config/`, `.cursor/`, `doc/specs/00_*.md` 等の既存構造。
