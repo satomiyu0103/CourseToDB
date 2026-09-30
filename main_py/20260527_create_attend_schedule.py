@@ -8,7 +8,6 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-
 from modules.calendar_io import resolve_file_path
 from modules.schedule_output import (
     ATTEND_SHEET_NAME,

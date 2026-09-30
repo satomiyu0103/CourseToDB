@@ -1,6 +1,6 @@
 ---
 description: コード・仕様変更時の Phase 入口（agent_core と併用）
-globs: src/**,doc/**,tests/**,scripts/**,config/**
+globs: src/**,doc/**,tests/**,scripts/**,config/**,gas/**
 alwaysApply: false
 ---
 

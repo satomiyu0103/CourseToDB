@@ -9,7 +9,19 @@ alwaysApply: true
 
 `ai-agent-devenv-template` は各プロジェクト開始時に **ワークスペースルートへ git clone する正本** である。プロジェクト間で Agent AI の運用（Rules・Skills・ログ手順）を同じ形に揃える。
 
-## 正本パス（本ワークスペースのみ）
+## 三モード判定
+
+作業ルートによって同期義務が変わる。編集・締めの前にモードを判定する。
+
+| モード | 判定（PowerShell 例） | 同期義務 |
+|---|---|---|
+| **Documents 同居** | `Test-Path dev_templates\ai-agent-devenv-template\TEMPLATE_VERSION.json` | ネスト clone 不要。`Documents/.cursor/scripts/sync-dev-template.py`（[dev-template-sync](../../.cursor/skills/dev-template-sync/SKILL.md)）で配布 |
+| **プロジェクト + ネスト clone** | `Test-Path ai-agent-devenv-template\.git` | ルート ↔ ネスト同期（本 rule 以下） |
+| **プロジェクト単体** | 上記いずれも `False` | **同期義務なし**。`memory_logger` のプロジェクト内記録のみ |
+
+Documents 同居時は [dev_task_entry](../../.cursor/rules/dev_task_entry.mdc) が入口。push は [git_local_only](../../.cursor/rules/git_local_only.mdc) により禁止。
+
+## 正本パス（プロジェクト + ネスト clone モードのみ）
 
 | 項目 | 内容 |
 |---|---|
@@ -25,7 +37,7 @@ alwaysApply: true
 Test-Path ai-agent-devenv-template\.git
 ```
 
-`True` なら同期義務あり。`False` のみ未配置として扱い、利用者へ clone 手順を報告する（黙ってスキップしない）。
+`True` なら **プロジェクト + ネスト clone** モードで同期義務あり。`False` かつ Documents 同居でも無い場合は **プロジェクト単体** モード（同期義務なし）。
 
 ### 正本リポジトリ単体で作業するとき
 
@@ -45,18 +57,18 @@ Documents ワークスペースでは、テンプレ → 各プロジェクト�
 
 本 rule の「同一ターン内のテンプレ反映」義務は従来どおり。一括同期は反映済みテンプレを他プロジェクトへ配るための仕組みであり、テンプレへの反映を置き換えるものではない。
 
-## 同期義務（常時・省略不可）
+## 同期義務（プロジェクト + ネスト clone モードのみ）
 
 ### いつ同期するか
 
-`ai-agent-devenv-template/` がワークスペースに存在するとき、**同期対象パスを 1 行でも変更・追加・削除したら**、ルート側の編集完了直後にテンプレへ反映する。
+**プロジェクト + ネスト clone** モードのとき、`ai-agent-devenv-template/` がワークスペースに存在し、**同期対象パスを 1 行でも変更・追加・削除したら**、ルート側の編集完了直後にテンプレへ反映する。
 
 | タイミング | 必須 |
 |---|---|
 | 同期対象ファイルの編集直後 | ○（同一ターン内） |
 | memory_stream / sessions / 開発日誌索引の追記直後 | ○ |
 | タスク完了報告の直前 | ○（未同期なら報告しない） |
-| セッション終了（「終了」等） | ○ + テンプレリポジトリ commit / push |
+| セッション終了（「終了」等） | ○ + テンプレリポジトリ commit / push（**プロジェクト単体**・**Documents 同居**では push 手順は [memory_logger](memory_logger.mdc) の作業ルート分岐に従う） |
 
 ### エージェントの手順（変更のたび）
 
@@ -108,8 +120,11 @@ Documents ワークスペースでは、テンプレ → 各プロジェクト�
 
 [memory_logger.mdc](memory_logger.mdc) の **セッション終了時の締め** に従う。ログ同期のあと:
 
-1. プロジェクトリポジトリ（ルート）を commit / push
-2. `ai-agent-devenv-template/` に変更があれば同リポジトリ内で commit / push
+| モード | プロジェクト repo | ネスト `ai-agent-devenv-template/` |
+|---|---|---|
+| **プロジェクト + ネスト clone** | commit + push | 変更があれば commit + push |
+| **Documents 同居** | commit のみ（push 禁止） | 該当なし（ネスト clone 不使用） |
+| **プロジェクト単体** | commit + push | 該当なし |
 
 変更が無いリポジトリはスキップする。`.env` 等の秘密ファイルは add しない。
 

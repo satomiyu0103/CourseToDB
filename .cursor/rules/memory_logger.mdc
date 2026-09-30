@@ -71,12 +71,20 @@ alwaysApply: true
 
 ## テンプレート同期
 
-- 同期先はワークスペースルート直下の `ai-agent-devenv-template/` のみ（[template_sync](template_sync.mdc)）。存在は `Test-Path ai-agent-devenv-template\.git` 等で確認し、Glob 未検出だけを根拠にスキップしない
-- ファクト追記後、上記が存在すれば [`.cursor/rules/template_sync.mdc`](template_sync.mdc) に従い `.cursor/doc/memory_stream.md` を **同一内容でコピー**する
-- **本ルールや memory_stream の運用定義**を変更した場合も `ai-agent-devenv-template/` を同期する
-- [template_sync](template_sync.mdc) の同期対象を **1 行でも** 変更したら、ファクト追記の有無にかかわらず **同一ターン内** にテンプレへ反映する（省略不可）
+- [template_sync](template_sync.mdc) の **三モード判定** に従う。**プロジェクト + ネスト clone** モードのときのみ、ルート直下 `ai-agent-devenv-template/` へ同期する
+- 存在は `Test-Path ai-agent-devenv-template\.git` 等で確認し、Glob 未検出だけを根拠にスキップしない
+- **Documents 同居**・**プロジェクト単体**ではネスト同期義務なし（Documents は `dev-template-sync`、単体はプロジェクト内記録のみ）
+- **本ルールや memory_stream の運用定義**を変更しネスト clone がある場合は `ai-agent-devenv-template/` を同期する
 
 ## セッション終了時の締め（commit / push）
+
+### 作業ルート別の push
+
+| 条件 | commit | push |
+|---|---|---|
+| **Documents 同居**（`dev_templates/ai-agent-devenv-template/` がワークスペースに存在、または Documents ルートで `RPA_scripts/**` を編集） | ○ | **禁止**（利用者明示時のみ。[dev_task_entry](../../.cursor/rules/dev_task_entry.mdc)） |
+| **プロジェクト単体ルート** | ○ | ○（下記手順） |
+| **プロジェクト + ネスト clone** | ○ | ○ + ネスト `ai-agent-devenv-template/` も push |
 
 ### 目的
 
@@ -94,10 +102,11 @@ alwaysApply: true
 ### 手順（順序固定）
 
 1. 本ルールに従い `memory_stream.md` へファクト追記（未追記なら実施）
-2. [template_sync](template_sync.mdc) でテンプレへログ関連ファイルをコピー（`memory_stream`・未同期の `doc/ai/sessions/`・`00_開発日誌` 等）
-3. **プロジェクトリポジトリ**（ルート）: `git status` → 変更があれば add → commit → `git push`
-4. **`ai-agent-devenv-template/`** が存在し変更があれば: 同リポジトリ内で add → commit → `git push`（親リポジトリとは別 git）
-5. チャットでコミットハッシュと push 先を簡潔に報告
+2. [template_sync](template_sync.mdc) のモードが **プロジェクト + ネスト clone** のとき、テンプレへログ関連ファイルをコピー（`memory_stream`・未同期の `doc/ai/sessions/`・`00_開発日誌` 等）
+3. **プロジェクトリポジトリ**（ルート）: `git status` → 変更があれば add → commit
+4. 上表の **push 可** のルートのときのみ `git push` を実行
+5. **`ai-agent-devenv-template/`** が存在し変更があり push 可モードのとき: 同リポジトリ内で add → commit → `git push`（親リポジトリとは別 git）
+6. チャットでコミットハッシュと push 有無を簡潔に報告
 
 ### commit 時の注意
 
