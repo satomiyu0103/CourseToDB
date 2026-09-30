@@ -10,6 +10,69 @@ from pathlib import Path
 import pandas as pd
 
 ATTEND_COLUMNS = ["日付", "講座名", "開始日時", "終了日時"]
+_SCHEDULE_YYYYMM_RE = re.compile(r"(\d{4})年(\d{1,2})月")
+
+
+def yyyymm_from_path(path: str | Path) -> int | None:
+    match = _SCHEDULE_YYYYMM_RE.search(Path(path).name)
+    if not match:
+        return None
+    year, month = int(match.group(1)), int(match.group(2))
+    return year * 100 + month
+
+
+def _schedule_sort_key(path: str) -> tuple[int, float, str]:
+    yyyymm = yyyymm_from_path(path)
+    try:
+        mtime = Path(path).stat().st_mtime
+    except OSError:
+        mtime = 0.0
+    return (yyyymm if yyyymm is not None else -1, mtime, path)
+
+
+def sort_schedule_paths(paths: list[str]) -> list[str]:
+    return sorted(paths, key=_schedule_sort_key, reverse=True)
+
+
+def pick_latest_schedule_path(paths: list[str]) -> str | None:
+    ranked = sort_schedule_paths(paths)
+    return ranked[0] if ranked else None
+
+
+def choose_schedule_path_interactive(paths: list[str]) -> str | None:
+    ranked = sort_schedule_paths(paths)
+    if not ranked:
+        return None
+
+    print("処理する Excel を選んでください:")
+    for index, file_path in enumerate(ranked, start=1):
+        label = Path(file_path).name
+        yyyymm = yyyymm_from_path(file_path)
+        if yyyymm is not None:
+            year, month = divmod(yyyymm, 100)
+            label = f"{label}  （{year}年{month}月）"
+        print(f"  {index}. {label}")
+
+    while True:
+        try:
+            choice = input("番号を入力（空 Enter で先頭）: ").strip()
+        except EOFError:
+            print("入力がキャンセルされました")
+            return None
+
+        if not choice:
+            return ranked[0]
+
+        if not choice.isdigit():
+            print("1 から数字で選んでください")
+            continue
+
+        selected = int(choice)
+        if 1 <= selected <= len(ranked):
+            return ranked[selected - 1]
+
+        print(f"1 〜 {len(ranked)} の番号を入力してください")
+
 
 def creat_file_path_list(folda_path):
     """
@@ -49,12 +112,28 @@ def find_calendar_name(file_path):
         print(f"error: ファイル{file_path}が見つかりません")
 
 
-def resolve_file_path(folda_path: str | None = None) -> str | None:
+def _normalize_excel_path(raw_path: str) -> Path:
+    return Path(raw_path.strip().strip('"')).expanduser()
+
+
+def resolve_file_path(
+    folda_path: str | None = None,
+    explicit_path: str | None = None,
+    *,
+    interactive: bool = True,
+) -> str | None:
+    if explicit_path:
+        path = _normalize_excel_path(explicit_path)
+        if path.is_file():
+            return str(path.resolve())
+        print(f"error: 指定されたファイルが見つかりません: {explicit_path}")
+        return None
+
     file_path = os.getenv("FILE_PATH")
     if file_path:
-        path = Path(file_path)
-        if path.exists():
-            return str(path)
+        path = _normalize_excel_path(file_path)
+        if path.is_file():
+            return str(path.resolve())
         print(f"error: FILE_PATH のファイルが見つかりません: {file_path}")
 
     if not folda_path:
@@ -63,7 +142,26 @@ def resolve_file_path(folda_path: str | None = None) -> str | None:
     data_list = creat_file_path_list(folda_path)
     if not data_list:
         return None
-    return data_list[-1]
+
+    if interactive:
+        import sys
+
+        if sys.stdin.isatty():
+            chosen = choose_schedule_path_interactive(data_list)
+            if chosen:
+                return chosen
+
+    latest = pick_latest_schedule_path(data_list)
+    if latest:
+        yyyymm = yyyymm_from_path(latest)
+        if yyyymm is not None:
+            year, month = divmod(yyyymm, 100)
+            print(
+                f"FOLDA_PATH から自動選択: {Path(latest).name} （{year}年{month}月・暦の最新）"
+            )
+        else:
+            print(f"FOLDA_PATH から自動選択: {Path(latest).name}")
+    return latest
 
 
 def read_attend_sheet(file_path: str, sheet_name: str) -> pd.DataFrame:

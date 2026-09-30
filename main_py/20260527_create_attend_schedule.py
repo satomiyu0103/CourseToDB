@@ -55,9 +55,26 @@ def main() -> None:
         description="職業準備性講座スケジュールから参加講座一覧を作成する"
     )
     parser.add_argument(
+        "excel_file",
+        nargs="?",
+        help="処理する配布用 Excel のパス（省略時は選択または .env）",
+    )
+    parser.add_argument(
+        "-f",
+        "--file",
+        dest="excel_file_opt",
+        metavar="PATH",
+        help="処理する配布用 Excel のパス（位置引数と同じ）",
+    )
+    parser.add_argument(
         "--export-csv",
         action="store_true",
         help="Excelの確認・修正後にCSVだけ再出力する",
+    )
+    parser.add_argument(
+        "--no-prompt",
+        action="store_true",
+        help="ファイル一覧の入力をスキップし、FOLDA_PATH から暦の最新を選ぶ",
     )
     args = parser.parse_args()
 
@@ -69,7 +86,12 @@ def main() -> None:
     print(f"FOLDA_PATH: {folda_path}")
     print(f"FILE_PATH: {os.getenv('FILE_PATH')}")
 
-    file_path = resolve_file_path(folda_path)
+    explicit = args.excel_file_opt or args.excel_file
+    file_path = resolve_file_path(
+        folda_path,
+        explicit_path=explicit,
+        interactive=not args.no_prompt,
+    )
     if not file_path:
         print("エラー: ファイルが見つかりません")
         return

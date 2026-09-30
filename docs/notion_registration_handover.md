@@ -43,7 +43,7 @@ CSV_OUTPUT_PATH=C:\...\出力先\custom.csv
 | 変数 | 説明 |
 |------|------|
 | `FILE_PATH` | 処理対象 Excel（優先使用） |
-| `FOLDA_PATH` | `FILE_PATH` 未設定時のフォールバック（glob で最新ファイル） |
+| `FOLDA_PATH` | `FILE_PATH` 未設定時の候補フォルダ（glob）。起動時に一覧から選ぶか、暦の最新（`YYYY年M月`）を自動選択 |
 | `CSV_OUTPUT_PATH` | CSV 出力先を固定したい場合（未設定時は自動命名） |
 
 ### 3.3 コマンド
@@ -52,11 +52,18 @@ CSV_OUTPUT_PATH=C:\...\出力先\custom.csv
 # リポジトリルートで
 cd main_py
 
-# 通常実行: Excel シート更新 + CSV 出力（1回で完了）
+# 通常実行: 起動後に候補一覧から Excel を選ぶ（Enter で暦の最新）
 python 20260527_create_attend_schedule.py
 
+# ファイルを起動時に指定（位置引数または -f）
+python 20260527_create_attend_schedule.py "C:\...\【2026年10月】配布用_職業準備性講座スケジュール.xlsx"
+python 20260527_create_attend_schedule.py -f "C:\...\【2026年10月】配布用_....xlsx"
+
+# 一覧を出さず FOLDA_PATH から暦の最新のみ（自動化向け）
+python 20260527_create_attend_schedule.py --no-prompt
+
 # Excel を手修正したあと CSV だけ再出力
-python 20260527_create_attend_schedule.py --export-csv
+python 20260527_create_attend_schedule.py -f "C:\...\対象.xlsx" --export-csv
 ```
 
 **注意:** 実行前に対象 Excel / CSV を他アプリで開かないこと（クラウド同期で `(1)` 付きファイルが増える原因になる）。

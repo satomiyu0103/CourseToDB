@@ -10,6 +10,9 @@
 
 ## [Unreleased]
 
+### Changed
+- `main_py` 講座スケジュール抽出: 起動時に Excel パス指定（`-f` / 位置引数）と候補一覧からの選択を追加。`FOLDA_PATH` 自動選択はファイル名の年月（YYYYMM）最大に変更
+
 - `docs` OWASP Agentic Top 10 防御系 Skills 同梱 — `agent-governance`・`agent-owasp-compliance`・`mcp-security-audit`・`owasp-agentic`・`llm-security` を `.cursor/skills/` に配置。`audit-security` から ASI スキャンを先行。`skills-lock.json` 追加
 - `docs` `NFR-OPS-003` `japanese-chat-mary` Skill 改訂 — ロールプレイ・お嬢様口調を廃止し、です・ます調の一貫を最優先に
 - `docs` `NFR-OPS-003` `japanese-chat-mary` Skill 新設 — チャット口調（メアリ・インスパイア）。`japanese-chat-marie` からリネーム
